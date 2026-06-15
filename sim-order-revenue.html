@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모두연결 · 카테고리별 주문수익·포인트 시뮬레이터</title>
+<style>
+  :root{--navy:#1F4E79;--blue:#2E75B6;--light:#EAF1FB;--line:#e3e9f2;--ink:#1c2733;--gray:#5b6b7b;--gold:#e0a106;--green:#2E7D32;--red:#c0392b;--bg:#eef3f9}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+  header{background:linear-gradient(135deg,#163a5c,#1F4E79 55%,#2E75B6);color:#fff;padding:28px 0 22px}
+  .tag{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+  header h1{font-size:23px;font-weight:800}
+  header .sub{opacity:.9;font-size:13px;margin-top:5px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 13px}
+  .kpi .l{font-size:11px;color:var(--gray)}
+  .kpi .v{font-size:19px;font-weight:800;color:var(--navy);margin-top:3px}
+  .kpi .d{font-size:10.5px;color:var(--gray);margin-top:2px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 8px rgba(31,78,121,.05);margin-bottom:16px}
+  .card h3{font-size:15px;color:var(--navy);margin-bottom:8px}
+  .simgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .sl .slrow{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+  .sl .slrow b{color:var(--navy)} .slv{color:var(--blue);font-weight:800}
+  input[type=range]{width:100%;accent-color:var(--blue);height:5px}
+  .slhint{font-size:10.5px;color:#9aa7b5;margin-top:3px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right}
+  th{background:var(--navy);color:#fff;font-size:11px}
+  th:first-child,td:first-child{text-align:left}
+  td:first-child{font-weight:600;color:var(--navy)}
+  tr.tot td{background:#fff7e6;font-weight:800;border-top:2px solid var(--gold)}
+  .note{font-size:11.5px;color:var(--gray);margin-top:8px}
+  .toolbar{margin:14px 0 2px}
+  .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:7px 15px;font-size:13px;cursor:pointer;color:var(--gray);font-family:inherit}
+  .seg button.on{background:var(--navy);color:#fff;font-weight:700}
+  footer{padding:20px 0 44px;color:var(--gray);font-size:11.5px;text-align:center}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.simgrid{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- INTEGRATED NAV START -->
+<style>
+  .mcnav{position:sticky;top:0;z-index:1000;background:#143150;color:#fff;
+    font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .mcnav-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;
+    gap:6px;padding:0 16px;flex-wrap:wrap}
+  .mcnav-brand{font-weight:800;font-size:15px;color:#fff;padding:11px 14px 11px 0;
+    letter-spacing:-.4px;white-space:nowrap}
+  .mcnav-brand span{color:#7fc1ff}
+  .mcnav-link{color:#cfe0f2;text-decoration:none;font-size:13px;font-weight:600;
+    padding:9px 13px;border-radius:8px;white-space:nowrap;transition:.15s}
+  .mcnav-link:hover{background:rgba(255,255,255,.12);color:#fff}
+  .mcnav-link.on{background:#2E75B6;color:#fff}
+  @media(max-width:640px){.mcnav-brand{width:100%;padding-bottom:4px}
+    .mcnav-link{font-size:12px;padding:7px 10px}}
+</style>
+<nav class="mcnav"><div class="mcnav-inner">
+<a class="mcnav-brand" href="index.html">모두연결 <span>포인트 전략</span></a>
+<a class="mcnav-link" href="index.html">종합 대시보드</a><a class="mcnav-link on" href="sim-order-revenue.html">주문수익·포인트</a><a class="mcnav-link" href="sim-point-usage.html">포인트 사용처·사용율</a><a class="mcnav-link" href="sim-acquisition.html">고객모집·마케팅</a><a class="mcnav-link" href="structure.html">전략 구조도</a>
+</div></nav>
+<!-- INTEGRATED NAV END -->
+
+<header><div class="wrap">
+  <span class="tag">시뮬레이션 · 가정 기반</span>
+  <h1>카테고리별 주문수익 · 고객 포인트 시뮬레이터</h1>
+  <div class="sub">모두연결 1차 10개 대분류 · 주문수·객단가·수수료·적립률을 조정해 카테고리별 수익과 포인트 적립을 즉시 계산</div>
+</div></header>
+<div class="wrap">
+  <div class="toolbar">
+    <div class="seg" id="periodSeg"><button data-p="m" class="on">월 기준</button><button data-p="y">연 환산(×12)</button></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card">
+    <h3>전역 가정 슬라이더</h3>
+    <div class="simgrid">
+      <div class="sl"><div class="slrow"><b>주문 성장 배수</b><span class="slv" id="vOrder">1.0×</span></div><input type="range" id="sOrder" min="0.5" max="3" step="0.1" value="1"><div class="slhint">전체 카테고리 주문수 배수</div></div>
+      <div class="sl"><div class="slrow"><b>평균 수수료율 배수</b><span class="slv" id="vFee">1.0×</span></div><input type="range" id="sFee" min="0.5" max="1.5" step="0.05" value="1"><div class="slhint">카테고리 기본 수수료율 ×</div></div>
+      <div class="sl"><div class="slrow"><b>고객 적립률</b><span class="slv" id="vEarn">1.5%</span></div><input type="range" id="sEarn" min="0.5" max="3" step="0.1" value="1.5"><div class="slhint">거래액 대비 포인트 적립</div></div>
+      <div class="sl"><div class="slrow"><b>안전결제(모두페이) 침투율</b><span class="slv" id="vPay">40%</span></div><input type="range" id="sPay" min="0" max="100" step="5" value="40"><div class="slhint">결제수수료 4% 적용</div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>카테고리별 수수료매출</h3><div id="chartFee"></div></div>
+    <div class="card"><h3>카테고리별 고객 포인트 적립</h3><div id="chartEarn"></div></div>
+  </div>
+  <div class="card">
+    <h3>카테고리별 상세</h3>
+    <div style="overflow-x:auto"><table id="tbl"></table></div>
+    <div class="note" id="note"></div>
+  </div>
+</div>
+<footer><div class="wrap">모두연결 · 카테고리별 주문수익·포인트 시뮬레이터 · 가정 기반 플래닝 도구 · 2026.06</div></footer>
+<script>
+// [name, 주문수/월, 객단가(만원), 수수료율%]
+var CATS=[
+ ['가사·돌봄',8000,8,12],['건물관리·청소',1500,30,10],['이사·입주청소',2500,25,9],
+ ['가전·가구청소',3000,12,10],['전문·특수청소',1200,40,9],['이사·운반·보관',2000,50,8],
+ ['설치·수리·조립',3500,15,10],['자동차',2500,10,10],['집수리',1000,80,8],['심부름·알바',6000,4,12]];
+var COLORS=['#1F4E79','#2E75B6','#3d86c2','#5B9BD5','#7faed e','#e0a106','#1f9d76','#9b59b6','#c0392b','#7a8aa0'];
+var S={order:1,fee:1,earn:1.5,pay:40}, period='m';
+function $(id){return document.getElementById(id);}
+function fmt(v,d){d=(d===undefined)?1:d;return Number(v).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmt0(v){return Number(Math.round(v)).toLocaleString('ko-KR');}
+function compute(){
+  var mul=period==='y'?12:1;
+  return CATS.map(function(c){
+    var orders=c[1]*S.order*mul;
+    var gmv=orders*c[2]*10000/1e8;            // 억
+    var fee=gmv*(c[3]*S.fee/100);
+    var earn=gmv*(S.earn/100);
+    var pay=gmv*(S.pay/100)*0.04;
+    return {name:c[0],orders:orders,gmv:gmv,fee:fee,earn:earn,pay:pay,feeRate:c[3]*S.fee};
+  });
+}
+function hbar(elId,rows,valKey,color,unit){
+  var max=Math.max.apply(null,rows.map(function(r){return r[valKey];}))||1;
+  var W=540,rh=26,L=110,H=rows.length*rh+10;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic">';
+  rows.forEach(function(r,i){
+    var y=i*rh+8, w=(W-L-70)*(r[valKey]/max);
+    s+='<text x="'+(L-6)+'" y="'+(y+13)+'" font-size="11" fill="#1c2733" text-anchor="end">'+r.name+'</text>';
+    s+='<rect x="'+L+'" y="'+y+'" width="'+Math.max(1,w)+'" height="16" rx="3" fill="'+color+'"/>';
+    s+='<text x="'+(L+w+5)+'" y="'+(y+13)+'" font-size="10.5" fill="#5b6b7b">'+fmt(r[valKey],1)+unit+'</text>';
+  });
+  s+='</svg>'; $(elId).innerHTML=s;
+}
+function render(){
+  var d=compute();
+  var tGmv=0,tFee=0,tEarn=0,tPay=0,tOrd=0;
+  d.forEach(function(r){tGmv+=r.gmv;tFee+=r.fee;tEarn+=r.earn;tPay+=r.pay;tOrd+=r.orders;});
+  var avgEarn=tGmv?tEarn/tGmv*100:0;
+  var pl=period==='y'?'/년':'/월';
+  $('kpis').innerHTML=
+    kpi('총 거래액(GMV)',fmt(tGmv,1)+'억',pl)+
+    kpi('총 수수료매출',fmt(tFee,1)+'억',pl)+
+    kpi('고객 포인트 적립',fmt(tEarn,1)+'억',pl)+
+    kpi('모두페이 수수료',fmt(tPay,1)+'억','침투율 '+S.pay+'%')+
+    kpi('총 주문수',fmt0(tOrd)+'건',pl);
+  var byFee=d.slice().sort(function(a,b){return b.fee-a.fee;});
+  var byEarn=d.slice().sort(function(a,b){return b.earn-a.earn;});
+  hbar('chartFee',byFee,'fee','#2E75B6','억');
+  hbar('chartEarn',byEarn,'earn','#1f9d76','억');
+  var h='<thead><tr><th>카테고리</th><th>주문수</th><th>객단가(만원)</th><th>GMV(억)</th><th>수수료율</th><th>수수료매출(억)</th><th>포인트적립(억)</th></tr></thead><tbody>';
+  d.forEach(function(r,i){
+    h+='<tr><td>'+r.name+'</td><td>'+fmt0(r.orders)+'</td><td>'+fmt0(CATS[i][2])+'</td><td>'+fmt(r.gmv,1)+'</td><td>'+fmt(r.feeRate,1)+'%</td><td>'+fmt(r.fee,1)+'</td><td>'+fmt(r.earn,2)+'</td></tr>';
+  });
+  h+='<tr class="tot"><td>합계</td><td>'+fmt0(tOrd)+'</td><td>–</td><td>'+fmt(tGmv,1)+'</td><td>'+fmt(avgEarn?tFee/tGmv*100:0,1)+'%</td><td>'+fmt(tFee,1)+'</td><td>'+fmt(tEarn,2)+'</td></tr>';
+  h+='</tbody>'; $('tbl').innerHTML=h;
+  $('note').textContent='기본값은 가정 예시입니다. 수수료율은 카테고리별로 다르며(8~12%), 적립률·침투율은 슬라이더로 조정합니다. 기준: '+(period==='y'?'연 환산':'월');
+}
+function kpi(l,v,d){return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>';}
+function bind(id,key,fn){var el=$(id);el.addEventListener('input',function(){S[key]=+el.value;$('v'+id.slice(1)).textContent=fn(+el.value);render();});}
+bind('sOrder','order',function(v){return v.toFixed(1)+'×';});
+bind('sFee','fee',function(v){return v.toFixed(2)+'×';});
+bind('sEarn','earn',function(v){return v.toFixed(1)+'%';});
+bind('sPay','pay',function(v){return v+'%';});
+$('periodSeg').addEventListener('click',function(e){if(e.target.tagName!=='BUTTON')return;Array.prototype.forEach.call(e.currentTarget.children,function(b){b.classList.remove('on');});e.target.classList.add('on');period=e.target.dataset.p;render();});
+render();
+</script>
+</body>
+</html>

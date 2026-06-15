@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모두연결 · 3개년 포인트 전략 대시보드</title>
+<style>
+  :root{
+    --navy:#1F4E79;--blue:#2E75B6;--sky:#5B9BD5;--light:#EAF1FB;--line:#e3e9f2;--ink:#1c2733;--gray:#5b6b7b;
+    --sup:#1f9d76;--cust:#2E75B6;--gold:#e0a106;--red:#c0392b;--green:#2E7D32;--bg:#eef3f9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 18px}
+  header{background:linear-gradient(135deg,#163a5c,#1F4E79 55%,#2E75B6);color:#fff;padding:30px 0 24px}
+  .tag{display:inline-block;background:var(--red);color:#fff;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:9px}
+  header h1{font-size:25px;font-weight:800;letter-spacing:-.5px}
+  header .sub{opacity:.9;font-size:13.5px;margin-top:6px}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0 4px}
+  .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:7px 16px;font-size:13px;cursor:pointer;color:var(--gray);font-family:inherit}
+  .seg button.on{background:var(--navy);color:#fff;font-weight:700}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:14px 0}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 13px;box-shadow:0 1px 6px rgba(31,78,121,.05)}
+  .kpi .l{font-size:11px;color:var(--gray)}
+  .kpi .v{font-size:20px;font-weight:800;color:var(--navy);margin-top:3px}
+  .kpi .d{font-size:10.5px;color:var(--green);margin-top:2px;font-weight:700}
+  .kpi .chk{font-size:10px;color:#9aa7b5;margin-top:1px}
+  section{padding:8px 0 4px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 8px rgba(31,78,121,.05);margin-bottom:16px}
+  .card h3{font-size:15px;color:var(--navy);margin-bottom:2px}
+  .card .cap{font-size:12px;color:var(--gray);margin-bottom:10px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .legend{display:flex;gap:13px;flex-wrap:wrap;font-size:11.5px;color:var(--gray);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .tabs button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 13px;font-size:12.5px;cursor:pointer;color:var(--gray);font-family:inherit}
+  .tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:700}
+  .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  table{border-collapse:collapse;font-size:11.5px;white-space:nowrap;min-width:100%}
+  th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right}
+  th{background:var(--navy);color:#fff;position:sticky;top:0;font-size:11px}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--light);font-weight:700;color:var(--navy)}
+  th:first-child{background:var(--navy);color:#fff;z-index:2}
+  .note{font-size:11.5px;color:var(--gray);margin-top:6px}
+  .card.sim{border:1.5px solid var(--blue);background:linear-gradient(180deg,#fbfdff,#fff)}
+  .simbadge{font-size:10.5px;background:var(--red);color:#fff;padding:2px 8px;border-radius:20px;vertical-align:middle;margin-left:6px;font-weight:700}
+  .simgrid{display:grid;grid-template-columns:1fr 1.25fr;gap:22px;align-items:start}
+  .sliders .sl{margin-bottom:13px}
+  .slrow{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+  .slrow span:first-child{color:var(--navy);font-weight:600}
+  .slv{color:var(--blue);font-weight:800}
+  .sliders input[type=range]{width:100%;accent-color:var(--blue);height:5px}
+  .slhint{font-size:10.5px;color:#9aa7b5;margin-top:2px}
+  #simReset{margin-top:6px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--gray)}
+  #simReset:hover{background:var(--light)}
+  .simout{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .tile{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#fff}
+  .tile .tl{font-size:11px;color:var(--gray)}
+  .tile .tv{font-size:18px;font-weight:800;color:var(--navy);margin-top:3px}
+  .tile .tb{font-size:11px;color:#9aa7b5;margin-top:2px}
+  .tile .delta{font-weight:800;font-size:12px;margin-top:2px}
+  .delta.pos{color:var(--green)} .delta.neg{color:var(--red)} .delta.zero{color:#9aa7b5}
+  .minibar{height:7px;border-radius:5px;background:#eef2f7;margin-top:7px;position:relative;overflow:hidden}
+  .minibar i{position:absolute;left:0;top:0;height:100%;border-radius:5px}
+  .minibar .base{background:#c7d6ea}.minibar .scn{background:var(--blue);opacity:.85}
+  footer{padding:22px 0 44px;color:var(--gray);font-size:11.5px;text-align:center}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.grid2,.simgrid{grid-template-columns:1fr}}
+  .addsim{margin-top:26px;border-top:3px solid var(--navy);padding-top:18px}
+  .addsim .h2{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:4px}
+  .addsim .h2 small{font-size:12px;color:var(--gray);font-weight:400;margin-left:8px}
+  .subtabs{display:flex;gap:8px;margin:12px 0 16px;flex-wrap:wrap}
+  .subtabs button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 16px;font-size:13.5px;cursor:pointer;color:var(--gray);font-family:inherit;font-weight:600}
+  .subtabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .subpanel{display:none}
+  .subpanel.on{display:block}
+  .subgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .subpanel .kpis{grid-template-columns:repeat(5,1fr)}
+  .subpanel tr.tot td{background:#fff7e6;font-weight:800;border-top:2px solid var(--gold)}
+  .lg{display:flex;flex-direction:column;gap:6px;font-size:12px}
+  .lg span{display:flex;align-items:center;gap:7px}
+  .pill{font-size:10px;padding:2px 7px;border-radius:20px;color:#fff}
+  @media(max-width:900px){.subgrid4{grid-template-columns:1fr 1fr}.subpanel .kpis{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<!-- INTEGRATED NAV START -->
+<style>
+  .mcnav{position:sticky;top:0;z-index:1000;background:#143150;color:#fff;
+    font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .mcnav-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;
+    gap:6px;padding:0 16px;flex-wrap:wrap}
+  .mcnav-brand{font-weight:800;font-size:15px;color:#fff;padding:11px 14px 11px 0;
+    letter-spacing:-.4px;white-space:nowrap}
+  .mcnav-brand span{color:#7fc1ff}
+  .mcnav-link{color:#cfe0f2;text-decoration:none;font-size:13px;font-weight:600;
+    padding:9px 13px;border-radius:8px;white-space:nowrap;transition:.15s}
+  .mcnav-link:hover{background:rgba(255,255,255,.12);color:#fff}
+  .mcnav-link.on{background:#2E75B6;color:#fff}
+  @media(max-width:640px){.mcnav-brand{width:100%;padding-bottom:4px}
+    .mcnav-link{font-size:12px;padding:7px 10px}}
+</style>
+<nav class="mcnav"><div class="mcnav-inner">
+<a class="mcnav-brand" href="index.html">모두연결 <span>포인트 전략</span></a>
+<a class="mcnav-link on" href="index.html">종합 대시보드</a><a class="mcnav-link" href="sim-order-revenue.html">주문수익·포인트</a><a class="mcnav-link" href="sim-point-usage.html">포인트 사용처·사용율</a><a class="mcnav-link" href="sim-acquisition.html">고객모집·마케팅</a><a class="mcnav-link" href="structure.html">전략 구조도</a>
+</div></nav>
+<!-- INTEGRATED NAV END -->
+
+<header><div class="wrap">
+  <span class="tag">투심보고서(2026.06) 정합 · 3개년 월별 모델</span>
+  <h1>모두연결 포인트 전략 종합 대시보드</h1>
+  <div class="sub">㈜홈스토리생활 · 공급자 포인트 단위경제 + 고객 포인트 부채/breakage · 2026.01–2028.12 (36개월) · 연간 합계는 보고서 추정치에 정합</div>
+</div></header>
+
+<div class="wrap">
+  <div class="toolbar">
+    <div class="seg" id="yearSeg">
+      <button data-y="all" class="on">전체 3개년</button>
+      <button data-y="0">2026</button>
+      <button data-y="1">2027</button>
+      <button data-y="2">2028</button>
+    </div>
+    <span class="note" id="rangeNote"></span>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <div class="card sim">
+      <h3>시뮬레이터 — 핵심 가정 What-if<span class="simbadge">보고서 baseline 대비</span></h3>
+      <div class="cap">슬라이더로 가정을 바꾸면 <b id="simPeriod">전체 3개년</b> 기준 결과가 즉시 재계산됩니다. 위 메인 차트·표는 보고서 정합 baseline을 그대로 유지합니다.</div>
+      <div class="simgrid">
+        <div class="sliders">
+          <div class="sl"><div class="slrow"><span>상담 과금 단가</span><span class="slv" id="vPrice">4,000원</span></div><input type="range" id="sPrice" min="2000" max="8000" step="100" value="4000"><div class="slhint">기본 4,000원 · 숨고 리드비 대비 30~50% 저렴</div></div>
+          <div class="sl"><div class="slrow"><span>상담 수요(리드) 증감</span><span class="slv" id="vDemand">100%</span></div><input type="range" id="sDemand" min="70" max="160" step="5" value="100"><div class="slhint">고객 포인트·생활노하우로 요청 모수 변화</div></div>
+          <div class="sl"><div class="slrow"><span>광고비 포인트 환급률</span><span class="slv" id="vRefund">50%</span></div><input type="range" id="sRefund" min="0" max="80" step="5" value="50"><div class="slhint">공급자 친화 ↑ = 비용 ↑ (기본 50%)</div></div>
+          <div class="sl"><div class="slrow"><span>환급 포인트 사용률</span><span class="slv" id="vUse">80%</span></div><input type="range" id="sUse" min="50" max="100" step="5" value="80"><div class="slhint">나머지는 breakage(소멸)</div></div>
+          <div class="sl"><div class="slrow"><span>고객 1인당 월 적립</span><span class="slv" id="vEarn">2,000원</span></div><input type="range" id="sEarn" min="500" max="5000" step="100" value="2000"><div class="slhint">고객 포인트 적립·부채 영향</div></div>
+          <div class="sl"><div class="slrow"><span>고객 활성(active) 배수</span><span class="slv" id="vCust">100%</span></div><input type="range" id="sCust" min="60" max="180" step="5" value="100"><div class="slhint">리텐션·활성화 수준</div></div>
+          <button id="simReset">기본값으로 초기화</button>
+        </div>
+        <div class="simout" id="simOut"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>월별 매출 구성 (스트림별 누적)</h3>
+      <div class="cap">막대 = 6개 매출 스트림(억) 누적 · 점선 = 총매출 추이. 연간합계 = 보고서 42.6/162.6/273.6억</div>
+      <div id="chartRevenue"></div>
+      <div class="legend" id="legendRev"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>수익성 추이 (월별)</h3>
+        <div class="cap">영업이익률 · 공헌이익률 (보고서 연간치에 수렴)</div>
+        <div id="chartMargin"></div>
+        <div class="legend">
+          <span><i class="sw" style="background:#e0a106"></i>영업이익률</span>
+          <span><i class="sw" style="background:#2E7D32"></i>공헌이익률</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>공급자 단위경제 — 상담 과금 & 광고 환급</h3>
+        <div class="cap">막대 = 상담건수(천건) · 선 = active 공급자(천명) / 광고환급</div>
+        <div id="chartSupplier"></div>
+        <div class="legend">
+          <span><i class="sw" style="background:#2E75B6"></i>상담건수(천)</span>
+          <span><i class="sw" style="background:#1f9d76"></i>active공급자(천)</span>
+          <span><i class="sw" style="background:#e0a106"></i>광고환급(억)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>고객 포인트 부채 & breakage (월별)</h3>
+      <div class="cap">막대 = 월 적립(억) · 선 = 부채잔액 / 사용 / 소멸(breakage)</div>
+      <div id="chartPoints"></div>
+      <div class="legend">
+        <span><i class="sw" style="background:#5B9BD5"></i>적립</span>
+        <span><i class="sw" style="background:#1F4E79"></i>부채잔액</span>
+        <span><i class="sw" style="background:#2E7D32"></i>사용</span>
+        <span><i class="sw" style="background:#c0392b"></i>소멸(breakage)</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>전체 월별 데이터 테이블</h3>
+      <div class="tabs" id="tableTabs">
+        <button data-t="pl" class="on">손익</button>
+        <button data-t="sup">공급자 단위경제</button>
+        <button data-t="pt">고객 포인트</button>
+      </div>
+      <div class="tblwrap"><table id="dataTable"></table></div>
+      <div class="note" id="assumNote"></div>
+    </div>
+  </section>
+</div>
+  <section class="addsim">
+    <div class="h2">추가 전략 시뮬레이터<small>탭으로 구분 · 카테고리/채널 기본값은 보고서·실데이터 보정</small></div>
+    <div class="subtabs" id="subtabs">
+      <button data-s="cat" class="on">① 카테고리별 주문수익·포인트</button>
+      <button data-s="ch">② 고객모집·마케팅채널</button>
+      <button data-s="pt">③ 포인트 사용처·사용율</button>
+    </div>
+
+    <div class="subpanel on" id="panel-cat">
+      <div class="card"><h3>전역 가정</h3>
+        <div class="subgrid4">
+          <div class="sl"><div class="slrow"><b>주문 성장 배수</b><span class="slv" id="vCatOrder">1.0×</span></div><input type="range" id="sCatOrder" min="0.5" max="3" step="0.1" value="1"><div class="slhint">전체 카테고리 주문수 ×</div></div>
+          <div class="sl"><div class="slrow"><b>평균 수수료율 배수</b><span class="slv" id="vCatFee">1.0×</span></div><input type="range" id="sCatFee" min="0.5" max="1.5" step="0.05" value="1"><div class="slhint">카테고리 기본 수수료율 ×</div></div>
+          <div class="sl"><div class="slrow"><b>고객 적립률</b><span class="slv" id="vCatEarn">1.5%</span></div><input type="range" id="sCatEarn" min="0.5" max="3" step="0.1" value="1.5"><div class="slhint">거래액 대비 포인트 적립</div></div>
+          <div class="sl"><div class="slrow"><b>모두페이 침투율</b><span class="slv" id="vCatPay">40%</span></div><input type="range" id="sCatPay" min="0" max="100" step="5" value="40"><div class="slhint">결제수수료 4% 적용</div></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>카테고리별 수수료매출 (월)</h3><div id="cat-chartFee"></div></div>
+        <div class="card"><h3>카테고리별 고객 포인트 적립 (월)</h3><div id="cat-chartEarn"></div></div>
+      </div>
+      <div class="card">
+        <div class="kpis" id="cat-kpis"></div>
+        <div style="overflow-x:auto"><table id="cat-tbl"></table></div>
+        <div class="note" id="cat-note"></div>
+      </div>
+    </div>
+
+    <div class="subpanel" id="panel-ch">
+      <div class="card"><h3>전역 가정</h3>
+        <div class="subgrid4">
+          <div class="sl"><div class="slrow"><b>총 예산 배수</b><span class="slv" id="vChBud">1.0×</span></div><input type="range" id="sChBud" min="0.3" max="3" step="0.1" value="1"><div class="slhint">전체 채널 예산 ×</div></div>
+          <div class="sl"><div class="slrow"><b>구매 전환율 배수</b><span class="slv" id="vChConv">1.0×</span></div><input type="range" id="sChConv" min="0.6" max="1.6" step="0.05" value="1"><div class="slhint">신규→구매 전환 ×</div></div>
+          <div class="sl"><div class="slrow"><b>고객 LTV</b><span class="slv" id="vChLtv">60,000원</span></div><input type="range" id="sChLtv" min="30000" max="150000" step="5000" value="60000"><div class="slhint">생애가치(누적 기여)</div></div>
+          <div class="sl"><div class="slrow"><b>무료·추천 채널 강화</b><span class="slv" id="vChOrg">1.0×</span></div><input type="range" id="sChOrg" min="0.5" max="3" step="0.1" value="1"><div class="slhint">추천·콘텐츠·경험연결 ×</div></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>채널별 월 신규 고객</h3><div id="ch-chartNew"></div></div>
+        <div class="card"><h3>채널별 효율 (LTV/CAC)</h3><div id="ch-chartEff"></div></div>
+      </div>
+      <div class="card">
+        <div class="kpis" id="ch-kpis"></div>
+        <div style="overflow-x:auto"><table id="ch-tbl"></table></div>
+        <div class="note" id="ch-note"></div>
+      </div>
+    </div>
+
+    <div class="subpanel" id="panel-pt">
+      <div class="card"><h3>전역 가정</h3>
+        <div class="subgrid4">
+          <div class="sl"><div class="slrow"><b>연 적립 규모</b><span class="slv" id="vPtIssue">30.0억</span></div><input type="range" id="sPtIssue" min="5" max="100" step="1" value="30"><div class="slhint">한 해 발행 고객 포인트</div></div>
+          <div class="sl"><div class="slrow"><b>전체 사용율</b><span class="slv" id="vPtRate">65%</span></div><input type="range" id="sPtRate" min="40" max="90" step="1" value="65"><div class="slhint">나머지는 breakage(소멸)</div></div>
+          <div class="sl"><div class="slrow"><b>포인트몰 비중</b><span class="slv" id="vPtMall">25%</span></div><input type="range" id="sPtMall" min="10" max="55" step="1" value="25"><div class="slhint">나머지 사용처 비례 조정</div></div>
+          <div class="sl"><div class="slrow"><b>포인트몰 구매 유발 배수</b><span class="slv" id="vPtLift">1.3×</span></div><input type="range" id="sPtLift" min="1" max="2.5" step="0.1" value="1.3"><div class="slhint">포인트 1원이 끄는 구매액</div></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>적립 → 사용 → 소멸 (연)</h3><div id="pt-chartFlow"></div></div>
+        <div class="card"><h3>사용처 구성</h3><div class="grid2" style="grid-template-columns:170px 1fr;gap:14px;align-items:center"><div id="pt-donut"></div><div class="lg" id="pt-legend"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="kpis" id="pt-kpis"></div>
+        <div style="overflow-x:auto"><table id="pt-tbl"></table></div>
+        <div class="note" id="pt-note"></div>
+      </div>
+    </div>
+  </section>
+
+<footer><div class="wrap">모두연결 · 3개년 포인트 전략 대시보드 (투심보고서 정합) · 2026.06 · 동봉 엑셀 모델(.xlsx)과 baseline 수치 동일</div></footer>
+
+<script>
+const D = {"months": ["26.01", "26.02", "26.03", "26.04", "26.05", "26.06", "26.07", "26.08", "26.09", "26.10", "26.11", "26.12", "27.01", "27.02", "27.03", "27.04", "27.05", "27.06", "27.07", "27.08", "27.09", "27.10", "27.11", "27.12", "28.01", "28.02", "28.03", "28.04", "28.05", "28.06", "28.07", "28.08", "28.09", "28.10", "28.11", "28.12"], "stream_names": ["용역매출", "가사 B2C 수수료", "C2C 견적채팅 수수료", "광고·상위노출·구독", "모두페이 수수료", "연계제휴(CPA/CPS)"], "streams": {"용역매출": [1.76, 1.73, 1.7, 1.66, 1.63, 1.6, 1.57, 1.54, 1.5, 1.47, 1.44, 1.41, 1.57, 1.55, 1.52, 1.49, 1.46, 1.43, 1.4, 1.37, 1.35, 1.32, 1.29, 1.26, 1.39, 1.36, 1.34, 1.31, 1.29, 1.26, 1.24, 1.21, 1.19, 1.16, 1.14, 1.11], "가사 B2C 수수료": [0.42, 0.46, 0.51, 0.55, 0.6, 0.64, 0.69, 0.73, 0.78, 0.83, 0.87, 0.92, 2.08, 2.31, 2.54, 2.77, 2.99, 3.22, 3.45, 3.67, 3.9, 4.13, 4.36, 4.58, 2.6, 2.89, 3.17, 3.46, 3.74, 4.02, 4.31, 4.59, 4.88, 5.16, 5.45, 5.73], "C2C 견적채팅 수수료": [0.46, 0.53, 0.6, 0.66, 0.73, 0.8, 0.87, 0.93, 1.0, 1.07, 1.14, 1.2, 1.55, 1.78, 2.0, 2.23, 2.45, 2.68, 2.9, 3.13, 3.36, 3.58, 3.81, 4.03, 4.4, 5.04, 5.68, 6.32, 6.96, 7.6, 8.24, 8.88, 9.52, 10.16, 10.8, 11.44], "광고·상위노출·구독": [0.12, 0.15, 0.17, 0.19, 0.22, 0.24, 0.26, 0.28, 0.31, 0.33, 0.35, 0.38, 1.58, 1.87, 2.16, 2.45, 2.73, 3.02, 3.31, 3.6, 3.89, 4.17, 4.46, 4.75, 2.5, 2.95, 3.41, 3.86, 4.32, 4.77, 5.23, 5.68, 6.14, 6.59, 7.05, 7.5], "모두페이 수수료": [0.09, 0.1, 0.12, 0.13, 0.15, 0.16, 0.17, 0.19, 0.2, 0.22, 0.23, 0.25, 0.96, 1.12, 1.28, 1.44, 1.6, 1.75, 1.91, 2.07, 2.23, 2.39, 2.54, 2.7, 1.8, 2.09, 2.39, 2.68, 2.98, 3.27, 3.56, 3.86, 4.15, 4.45, 4.74, 5.04], "연계제휴(CPA/CPS)": [0.02, 0.03, 0.03, 0.04, 0.04, 0.05, 0.05, 0.06, 0.06, 0.07, 0.07, 0.08, 0.48, 0.58, 0.67, 0.77, 0.86, 0.96, 1.06, 1.15, 1.25, 1.34, 1.44, 1.54, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]}, "revenue": [2.88, 3.0, 3.12, 3.24, 3.37, 3.49, 3.61, 3.73, 3.86, 3.98, 4.1, 4.22, 8.24, 9.2, 10.17, 11.13, 12.1, 13.07, 14.03, 15.0, 15.97, 16.93, 17.9, 18.86, 13.19, 14.94, 16.68, 18.43, 20.18, 21.93, 23.67, 25.42, 27.17, 28.92, 30.66, 32.41], "contrib": [0.84, 0.88, 0.91, 0.95, 0.99, 1.02, 1.06, 1.09, 1.13, 1.17, 1.2, 1.24, 3.17, 3.54, 3.92, 4.29, 4.66, 5.03, 5.4, 5.77, 6.15, 6.52, 6.89, 7.26, 6.2, 7.02, 7.84, 8.66, 9.48, 10.31, 11.13, 11.95, 12.77, 13.59, 14.41, 15.23], "varcost": [2.03, 2.12, 2.21, 2.29, 2.38, 2.47, 2.55, 2.64, 2.73, 2.81, 2.9, 2.99, 5.07, 5.66, 6.25, 6.85, 7.44, 8.04, 8.63, 9.22, 9.82, 10.41, 11.01, 11.6, 6.99, 7.92, 8.84, 9.77, 10.69, 11.62, 12.55, 13.47, 14.4, 15.33, 16.25, 17.18], "fixed": [0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13, 3.13], "op": [-0.11, -0.08, -0.04, -0.01, 0.03, 0.07, 0.1, 0.14, 0.17, 0.21, 0.25, 0.28, 1.37, 1.74, 2.11, 2.49, 2.86, 3.23, 3.6, 3.97, 4.35, 4.72, 5.09, 5.46, 3.07, 3.89, 4.71, 5.53, 6.35, 7.17, 7.99, 8.82, 9.64, 10.46, 11.28, 12.1], "opm": [-4.0, -2.6, -1.4, -0.2, 0.9, 1.9, 2.8, 3.7, 4.5, 5.3, 6.0, 6.7, 16.6, 18.9, 20.8, 22.3, 23.6, 24.7, 25.7, 26.5, 27.2, 27.9, 28.4, 29.0, 23.2, 26.0, 28.2, 30.0, 31.5, 32.7, 33.8, 34.7, 35.5, 36.2, 36.8, 37.3], "cm": [29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 29.3, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 38.5, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0, 47.0], "consult_cnt": [11574, 13258, 14941, 16625, 18308, 19992, 21675, 23359, 25042, 26726, 28409, 30093, 38773, 44413, 50053, 55692, 61332, 66972, 72612, 78251, 83891, 89531, 95170, 100810, 109954, 125947, 141940, 157934, 173927, 189920, 205913, 221907, 237900, 253893, 269886, 285880], "sup_active": [3711, 3833, 3975, 4138, 4326, 4542, 4788, 5068, 5383, 5736, 6129, 6562, 7034, 7544, 8089, 8663, 9261, 9876, 10500, 11124, 11739, 12337, 12911, 13456, 13966, 14438, 14871, 15264, 15617, 15932, 16212, 16458, 16674, 16862, 17025, 17167], "consult_per_sup": [3.1, 3.5, 3.8, 4.0, 4.2, 4.4, 4.5, 4.6, 4.7, 4.7, 4.6, 4.6, 5.5, 5.9, 6.2, 6.4, 6.6, 6.8, 6.9, 7.0, 7.1, 7.3, 7.4, 7.5, 7.9, 8.7, 9.5, 10.3, 11.1, 11.9, 12.7, 13.5, 14.3, 15.1, 15.9, 16.7], "ad_rev": [0.12, 0.15, 0.17, 0.19, 0.22, 0.24, 0.26, 0.28, 0.31, 0.33, 0.35, 0.38, 1.58, 1.87, 2.16, 2.45, 2.73, 3.02, 3.31, 3.6, 3.89, 4.17, 4.46, 4.75, 2.5, 2.95, 3.41, 3.86, 4.32, 4.77, 5.23, 5.68, 6.14, 6.59, 7.05, 7.5], "ad_refund": [0.06, 0.07, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.18, 0.19, 0.79, 0.94, 1.08, 1.22, 1.37, 1.51, 1.66, 1.8, 1.94, 2.09, 2.23, 2.38, 1.25, 1.48, 1.7, 1.93, 2.16, 2.39, 2.61, 2.84, 3.07, 3.3, 3.52, 3.75], "ad_net": [0.07, 0.09, 0.1, 0.12, 0.13, 0.14, 0.16, 0.17, 0.18, 0.2, 0.21, 0.22, 0.95, 1.12, 1.3, 1.47, 1.64, 1.81, 1.99, 2.16, 2.33, 2.5, 2.68, 2.85, 1.5, 1.77, 2.05, 2.32, 2.59, 2.86, 3.14, 3.41, 3.68, 3.95, 4.23, 4.5], "sup_burn": [0.59, 0.68, 0.77, 0.86, 0.95, 1.04, 1.13, 1.22, 1.31, 1.4, 1.49, 1.58, 3.13, 3.65, 4.16, 4.67, 5.19, 5.7, 6.22, 6.73, 7.24, 7.76, 8.27, 8.78, 6.9, 7.99, 9.09, 10.18, 11.28, 12.37, 13.46, 14.56, 15.65, 16.75, 17.84, 18.94], "sup_cash_topup": [0.54, 0.62, 0.7, 0.78, 0.86, 0.94, 1.02, 1.1, 1.19, 1.27, 1.35, 1.43, 2.5, 2.9, 3.3, 3.7, 4.09, 4.49, 4.89, 5.29, 5.69, 6.09, 6.48, 6.88, 5.9, 6.81, 7.72, 8.64, 9.55, 10.46, 11.37, 12.29, 13.2, 14.11, 15.02, 15.94], "cust_total": [300000, 306286, 312571, 318857, 325143, 331429, 337714, 344000, 350286, 356571, 362857, 369143, 375429, 381714, 388000, 394286, 400571, 406857, 413143, 419429, 425714, 432000, 438286, 444571, 450857, 457143, 463429, 469714, 476000, 482286, 488571, 494857, 501143, 507429, 513714, 520000], "cust_active": [36000, 38330, 40724, 43182, 45706, 48294, 50947, 53664, 56446, 59293, 62204, 65180, 68221, 71326, 74496, 77731, 81030, 84394, 87822, 91316, 94873, 98496, 102183, 105935, 109751, 113633, 117579, 121589, 125664, 129804, 134008, 138277, 142611, 147009, 151472, 156000], "earn": [0.72, 0.767, 0.814, 0.864, 0.914, 0.966, 1.019, 1.073, 1.129, 1.186, 1.244, 1.304, 1.364, 1.427, 1.49, 1.555, 1.621, 1.688, 1.756, 1.826, 1.897, 1.97, 2.044, 2.119, 2.195, 2.273, 2.352, 2.432, 2.513, 2.596, 2.68, 2.766, 2.852, 2.94, 3.029, 3.12], "use": [0.324, 0.416, 0.5, 0.577, 0.648, 0.716, 0.78, 0.843, 0.904, 0.964, 1.024, 1.083, 1.143, 1.203, 1.263, 1.324, 1.386, 1.449, 1.512, 1.577, 1.642, 1.709, 1.777, 1.846, 1.916, 1.987, 2.06, 2.133, 2.208, 2.284, 2.361, 2.44, 2.52, 2.6, 2.683, 2.766], "brk": [0.0, 0.006, 0.011, 0.016, 0.02, 0.023, 0.027, 0.03, 0.033, 0.036, 0.039, 0.041, 0.044, 0.047, 0.049, 0.052, 0.055, 0.057, 0.06, 0.063, 0.066, 0.069, 0.071, 0.074, 0.077, 0.08, 0.083, 0.087, 0.09, 0.093, 0.096, 0.1, 0.103, 0.106, 0.11, 0.114], "bal": [0.396, 0.74, 1.044, 1.315, 1.562, 1.788, 2.0, 2.2, 2.392, 2.578, 2.759, 2.938, 3.116, 3.293, 3.47, 3.649, 3.828, 4.01, 4.194, 4.381, 4.57, 4.762, 4.958, 5.156, 5.358, 5.563, 5.772, 5.984, 6.199, 6.418, 6.641, 6.867, 7.097, 7.33, 7.567, 7.807], "annual": {"year": [2026, 2027, 2028], "revenue": [42.6, 162.6, 273.6], "contrib": [12.5, 62.6, 128.6], "op": [1.0, 41.0, 91.0], "opm": [2.3, 25.2, 33.2], "cm": [29.3, 38.5, 47.0], "consult": [250002, 837500, 2375001], "ad_rev": [3.0, 38.0, 60.0], "ad_refund": [1.5, 19.0, 30.0], "earn": [12.0, 20.76, 31.75], "use": [8.78, 17.83, 27.96], "brk": [0.28, 0.71, 1.14], "brk_rate": [2.3, 3.4, 3.6], "report_rev": [42.6, 162.6, 273.6], "report_opm": [2.3, 25.2, 33.2], "report_cm": [29.3, 38.5, 47.0]}, "assum": {"상담 과금 단가": "4,000원 (숨고 리드비 대비 30~50% 저렴)", "광고비 포인트 환급률": "50%", "환급 포인트 사용률": "80% (breakage 20%)", "고객 1인당 월 적립": "2,000원 (active 기준)", "고객 포인트 유효기간": "12개월 (월 소멸 ≈1.5%)", "공급자 수": "월 active 3,000 → 18,000 (S-curve)", "고객 수": "30만 → 52만"}};
+const STREAM_COLORS = ['#1F4E79','#2E75B6','#5B9BD5','#e0a106','#1f9d76','#9b59b6'];
+let curYear = 'all';
+const C2CNAME = 'C2C 견적채팅 수수료';
+function idx(){ return curYear==='all' ? [0,36] : [curYear*12, curYear*12+12]; }
+function slice(a){ const r=idx(); return a.slice(r[0],r[1]); }
+function fmt(v,d){ d=(d===undefined)?1:d; return Number(v).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function fmt0(v){ return Number(Math.round(v)).toLocaleString('ko-KR'); }
+function svgEl(w,h){ return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic,sans-serif">'; }
+function drawStacked(elId, labels, series, lineSeries){
+  const W=1180,L=44,R=44,T=14,B=40,H=300, pw=W-L-R, ph=H-T-B, baseY=T+ph, n=labels.length;
+  const totals = labels.map(function(_,i){ return series.reduce(function(s,se){return s+se.data[i];},0); });
+  let max = Math.max.apply(null, totals.concat(lineSeries?lineSeries[0].data:[0]))*1.1 || 1;
+  const bw = pw/n*0.7, xc=function(i){return L+(i+0.5)*(pw/n);}, y=function(v){return baseY-(v/max)*ph;};
+  let s=svgEl(W,H);
+  for(let g=0;g<=4;g++){ const gv=max*g/4, yy=y(gv); s+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#eef2f7"/><text x="'+(L-5)+'" y="'+(yy+3)+'" font-size="9" fill="#9aa7b5" text-anchor="end">'+fmt(gv,0)+'</text>'; }
+  for(let i=0;i<n;i++){
+    let acc=0;
+    series.forEach(function(se){ const v=se.data[i]; if(v<=0)return; const y0=y(acc), y1=y(acc+v); s+='<rect x="'+(xc(i)-bw/2)+'" y="'+y1+'" width="'+bw+'" height="'+Math.max(0,y0-y1)+'" fill="'+se.color+'"><title>'+labels[i]+' '+se.name+': '+fmt(v,2)+'억</title></rect>'; acc+=v; });
+    if(n<=12 || i%2===0) s+='<text x="'+xc(i)+'" y="'+(baseY+13)+'" font-size="8.5" fill="#5b6b7b" text-anchor="middle">'+labels[i]+'</text>';
+  }
+  if(lineSeries) lineSeries.forEach(function(ls){ let d=''; ls.data.forEach(function(v,i){ d+=(i?'L':'M')+xc(i)+' '+y(v)+' '; }); s+='<path d="'+d+'" fill="none" stroke="'+ls.color+'" stroke-width="2" stroke-dasharray="2 2"/>'; });
+  s+='</svg>'; document.getElementById(elId).innerHTML=s;
+}
+function drawLines(elId, labels, series, opts){
+  opts=opts||{}; const W=560,L=42,R=20,T=14,B=36,H=260, pw=W-L-R,ph=H-T-B,baseY=T+ph,n=labels.length;
+  const all=series.reduce(function(a,s){return a.concat(s.data);},[]);
+  let mn=opts.min!==undefined?opts.min:Math.min.apply(null,all.concat(0)), mx=opts.max!==undefined?opts.max:Math.max.apply(null,all);
+  const sp=(mx-mn)||1, xc=function(i){return L+i*(pw/(n-1||1));}, y=function(v){return baseY-((v-mn)/sp)*ph;};
+  let s=svgEl(W,H);
+  for(let g=0;g<=4;g++){ const gv=mn+sp*g/4, yy=y(gv); s+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#eef2f7"/><text x="'+(L-5)+'" y="'+(yy+3)+'" font-size="9" fill="#9aa7b5" text-anchor="end">'+fmt(gv,0)+(opts.pct?'%':'')+'</text>'; }
+  series.forEach(function(se){ let d=''; se.data.forEach(function(v,i){ d+=(i?'L':'M')+xc(i)+' '+y(v)+' '; }); s+='<path d="'+d+'" fill="none" stroke="'+se.color+'" stroke-width="2.2"/>';
+    if(n<=14) se.data.forEach(function(v,i){ s+='<circle cx="'+xc(i)+'" cy="'+y(v)+'" r="2.6" fill="#fff" stroke="'+se.color+'" stroke-width="1.6"/>'; }); });
+  for(let i=0;i<n;i++){ if(n<=12||i%3===0) s+='<text x="'+xc(i)+'" y="'+(baseY+13)+'" font-size="8.5" fill="#5b6b7b" text-anchor="middle">'+labels[i]+'</text>'; }
+  s+='</svg>'; document.getElementById(elId).innerHTML=s;
+}
+function drawComboBarLine(elId, labels, bars, lines){
+  const W=560,L=40,R=40,T=14,B=36,H=260, pw=W-L-R,ph=H-T-B,baseY=T+ph,n=labels.length;
+  const bmax=Math.max.apply(null,bars.reduce(function(a,b){return a.concat(b.data);},[]))*1.15||1;
+  const lmax=Math.max.apply(null,lines.reduce(function(a,l){return a.concat(l.data);},[]))*1.15||1;
+  const xc=function(i){return L+(i+0.5)*(pw/n);}, yb=function(v){return baseY-(v/bmax)*ph;}, yl=function(v){return baseY-(v/lmax)*ph;}, bw=pw/n*0.55;
+  let s=svgEl(W,H);
+  for(let g=0;g<=4;g++){ const yy=T+ph*g/4; s+='<line x1="'+L+'" y1="'+yy+'" x2="'+(W-R)+'" y2="'+yy+'" stroke="#eef2f7"/>'; }
+  bars.forEach(function(b){ b.data.forEach(function(v,i){ s+='<rect x="'+(xc(i)-bw/2)+'" y="'+yb(v)+'" width="'+bw+'" height="'+(baseY-yb(v))+'" rx="2" fill="'+b.color+'" opacity=".9"><title>'+labels[i]+': '+fmt(v,1)+'</title></rect>'; }); });
+  lines.forEach(function(l){ let d=''; l.data.forEach(function(v,i){ d+=(i?'L':'M')+xc(i)+' '+yl(v)+' '; }); s+='<path d="'+d+'" fill="none" stroke="'+l.color+'" stroke-width="2.2"/>'; });
+  for(let i=0;i<n;i++){ if(n<=12||i%3===0) s+='<text x="'+xc(i)+'" y="'+(baseY+13)+'" font-size="8.5" fill="#5b6b7b" text-anchor="middle">'+labels[i]+'</text>'; }
+  s+='</svg>'; document.getElementById(elId).innerHTML=s;
+}
+
+function kpiCard(l,v,d,chk){ return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div><div class="chk">'+(chk||'')+'</div></div>'; }
+function renderKPI(){
+  const a=D.annual; let html='';
+  if(curYear==='all'){
+    html+=kpiCard('매출 합계',fmt(a.revenue.reduce(function(x,y){return x+y;},0),1)+'억','3개년','');
+    html+=kpiCard('2028F 매출',fmt(a.revenue[2],1)+'억','보고서 273.6','정합 ✓');
+    html+=kpiCard('2028F 영업이익률',a.opm[2]+'%','보고서 33.2%','정합 ✓');
+    html+=kpiCard('상담 과금 건수',fmt0(a.consult.reduce(function(x,y){return x+y;},0)),'3개년 누적','');
+    html+=kpiCard('광고 포인트 환급',fmt(a.ad_refund.reduce(function(x,y){return x+y;},0),1)+'억','50% 환급','');
+    html+=kpiCard('고객 포인트 적립',fmt(a.earn.reduce(function(x,y){return x+y;},0),1)+'억','3개년','');
+  } else {
+    const i=+curYear;
+    html+=kpiCard('매출',fmt(a.revenue[i],1)+'억','보고서 '+a.report_rev[i],'정합 ✓');
+    html+=kpiCard('영업이익',fmt(a.op[i],1)+'억','영익률 '+a.opm[i]+'%','');
+    html+=kpiCard('공헌이익률',a.cm[i]+'%','보고서 '+a.report_cm[i]+'%','정합 ✓');
+    html+=kpiCard('상담 과금 건수',fmt0(a.consult[i]),'건/년','');
+    html+=kpiCard('광고 포인트 환급',fmt(a.ad_refund[i],1)+'억','광고매출 '+fmt(a.ad_rev[i],1)+'억','');
+    html+=kpiCard('고객 포인트',fmt(a.earn[i],1)+'억 적립','소멸 '+a.brk_rate[i]+'%','');
+  }
+  document.getElementById('kpis').innerHTML=html;
+}
+function render(){
+  const lab=slice(D.months);
+  const series=D.stream_names.map(function(nm,i){return {name:nm,color:STREAM_COLORS[i],data:slice(D.streams[nm])};});
+  drawStacked('chartRevenue', lab, series, [{name:'총매출',color:'#1F4E79',data:slice(D.revenue)}]);
+  document.getElementById('legendRev').innerHTML=D.stream_names.map(function(nm,i){return '<span><i class="sw" style="background:'+STREAM_COLORS[i]+'"></i>'+nm+'</span>';}).join('');
+  drawLines('chartMargin', lab, [
+    {name:'영업이익률',color:'#e0a106',data:slice(D.opm)},
+    {name:'공헌이익률',color:'#2E7D32',data:slice(D.cm)}
+  ], {pct:true, min:Math.min.apply(null,D.opm)-3, max:Math.max.apply(null,D.cm)+3});
+  drawComboBarLine('chartSupplier', lab,
+    [{name:'상담건수(천)',color:'#2E75B6',data:slice(D.consult_cnt).map(function(v){return v/1000;})}],
+    [{name:'active공급자(천)',color:'#1f9d76',data:slice(D.sup_active).map(function(v){return v/1000;})},
+     {name:'광고환급(억)',color:'#e0a106',data:slice(D.ad_refund)}]);
+  drawComboBarLine('chartPoints', lab,
+    [{name:'적립',color:'#5B9BD5',data:slice(D.earn)}],
+    [{name:'부채잔액',color:'#1F4E79',data:slice(D.bal)},
+     {name:'사용',color:'#2E7D32',data:slice(D.use)},
+     {name:'소멸',color:'#c0392b',data:slice(D.brk)}]);
+  renderKPI(); renderTable(); renderSim();
+}
+let curTab='pl';
+function renderTable(){
+  const m=D.months, r=idx(), cols=[];
+  for(let i=r[0];i<r[1];i++) cols.push(i);
+  let rows=[];
+  if(curTab==='pl'){
+    rows=[['매출',D.revenue,2]].concat(D.stream_names.map(function(nm){return ['  '+nm,D.streams[nm],2];})).concat([
+      ['공헌이익',D.contrib,2],['변동비',D.varcost,2],['고정비',D.fixed,2],['영업이익',D.op,2],
+      ['영업이익률(%)',D.opm,1],['공헌이익률(%)',D.cm,1]]);
+  } else if(curTab==='sup'){
+    rows=[['C2C수수료(억)',D.streams[C2CNAME],2],['상담건수',D.consult_cnt,0],['active공급자',D.sup_active,0],
+      ['상담/공급자',D.consult_per_sup,1],['광고매출(억)',D.ad_rev,2],['광고환급50%(억)',D.ad_refund,2],
+      ['순광고기여(억)',D.ad_net,2],['포인트소진(억)',D.sup_burn,2],['현금충전(억)',D.sup_cash_topup,2]];
+  } else {
+    rows=[['고객수',D.cust_total,0],['active고객',D.cust_active,0],['월적립(억)',D.earn,3],
+      ['월사용(억)',D.use,3],['월소멸(억)',D.brk,3],['부채잔액(억)',D.bal,3]];
+  }
+  let html='<thead><tr><th>항목</th>'+cols.map(function(i){return '<th>'+m[i]+'</th>';}).join('')+(curYear==='all'?'':'<th>연합계</th>')+'</tr></thead><tbody>';
+  rows.forEach(function(row){
+    const name=row[0], arr=row[1], dec=row[2]; const isPct=name.indexOf('%')>=0;
+    html+='<tr><td>'+name+'</td>'; let sum=0;
+    cols.forEach(function(i){ const v=arr[i]; sum+=v; html+='<td>'+(isPct?fmt(v,dec):(dec===0?fmt0(v):fmt(v,dec)))+'</td>'; });
+    if(curYear!=='all'){ const show=isPct?(sum/cols.length):sum; html+='<td><b>'+(isPct?fmt(show,1):(dec===0?fmt0(show):fmt(show,dec)))+'</b></td>'; }
+    html+='</tr>';
+  });
+  html+='</tbody>'; document.getElementById('dataTable').innerHTML=html;
+  document.getElementById('assumNote').innerHTML='가정: '+Object.keys(D.assum).map(function(k){return k+' '+D.assum[k];}).join(' · ');
+}
+const SIM={price:4000,demand:100,refund:50,refundUse:80,earn:2000,cust:100};
+function rollPoints(earnArr){
+  let prev=0; const use=[],brk=[],bal=[];
+  for(let i=0;i<earnArr.length;i++){ const u=Math.min(prev*0.18+earnArr[i]*0.45, prev+earnArr[i]); const b=prev*0.015; const end=prev+earnArr[i]-u-b; use.push(u);brk.push(b);bal.push(end);prev=end; }
+  return {use:use,brk:brk,bal:bal};
+}
+function renderSim(){
+  const r=idx(), s=r[0], e=r[1];
+  const demandR=SIM.demand/100, refundR=SIM.refund/100, useR=SIM.refundUse/100, earnR=(SIM.earn/2000)*(SIM.cust/100);
+  const consult_s=D.consult_cnt.map(function(v){return v*demandR;});
+  const c2c_s=consult_s.map(function(v){return v*SIM.price/1e8;});
+  const refund_s=D.ad_rev.map(function(v){return v*refundR;});
+  const refundUsed_s=refund_s.map(function(v){return v*useR;});
+  const earn_s=D.earn.map(function(v){return v*earnR;});
+  const pt=rollPoints(earn_s);
+  const baseRefundUsed=D.ad_refund.map(function(v){return v*0.8;});
+  function sum(a){let t=0;for(let i=s;i<e;i++)t+=a[i];return t;}
+  const b={rev:sum(D.revenue),op:sum(D.op),c2c:sum(D.streams[C2CNAME]),consult:sum(D.consult_cnt),refundUsed:sum(baseRefundUsed),earn:sum(D.earn),bal:D.bal[e-1]};
+  const dC2C=sum(c2c_s)-b.c2c, dRefund=sum(refundUsed_s)-b.refundUsed, dUse=sum(pt.use)-sum(D.use);
+  const sc={rev:b.rev+dC2C, op:b.op+dC2C-dRefund-dUse, c2c:sum(c2c_s), consult:sum(consult_s), refundUsed:sum(refundUsed_s), earn:sum(earn_s), bal:pt.bal[e-1]};
+  const opmB=b.rev?b.op/b.rev*100:0, opmS=sc.rev?sc.op/sc.rev*100:0;
+  const tiles=[
+    tile('총매출','억',b.rev,sc.rev,1,true),
+    tile('영업이익','억',b.op,sc.op,1,true),
+    tile('영업이익률','%',opmB,opmS,1,true),
+    tile('C2C 수수료매출','억',b.c2c,sc.c2c,1,true),
+    tile('상담 과금 건수','건',b.consult,sc.consult,0,true),
+    tile('광고환급 비용(사용)','억',b.refundUsed,sc.refundUsed,1,false),
+    tile('고객포인트 적립','억',b.earn,sc.earn,2,null),
+    tile('고객포인트 부채잔액(기말)','억',b.bal,sc.bal,2,null)
+  ];
+  document.getElementById('simOut').innerHTML=tiles.join('');
+  document.getElementById('simPeriod').textContent=curYear==='all'?'전체 3개년':(D.annual.year[curYear]+'년');
+}
+function tile(label,unit,base,scn,dec,goodUp){
+  const d=scn-base, pct=base?d/base*100:0; let cls='zero',arrow='–';
+  if(Math.abs(d)>1e-9){ const positive=(goodUp===null)?null:((d>0)===goodUp); cls=(positive===null)?'zero':(positive?'pos':'neg'); arrow=d>0?'▲':'▼'; }
+  const f=function(v){return dec===0?fmt0(v):fmt(v,dec);};
+  const u=unit==='%'?'%':unit;
+  const maxv=Math.max(base,scn,1e-9);
+  const deltaTxt=Math.abs(d)<1e-9?'동일':(arrow+' '+(dec===0?fmt0(Math.abs(d)):fmt(Math.abs(d),dec))+u+' ('+(pct>0?'+':'')+fmt(pct,1)+'%)');
+  return '<div class="tile"><div class="tl">'+label+'</div><div class="tv">'+f(scn)+u+'</div><div class="tb">baseline '+f(base)+u+'</div><div class="delta '+cls+'">'+deltaTxt+'</div><div class="minibar"><i class="base" style="width:'+(base/maxv*100)+'%"></i><i class="scn" style="width:'+(scn/maxv*100)+'%;mix-blend-mode:multiply"></i></div></div>';
+}
+function bindSlider(id,key,fmtFn){
+  const el=document.getElementById(id);
+  el.addEventListener('input',function(){ SIM[key]=+el.value; document.getElementById('v'+id.slice(1)).textContent=fmtFn(+el.value); renderSim(); });
+}
+bindSlider('sPrice','price',function(v){return fmt0(v)+'원';});
+bindSlider('sDemand','demand',function(v){return v+'%';});
+bindSlider('sRefund','refund',function(v){return v+'%';});
+bindSlider('sUse','refundUse',function(v){return v+'%';});
+bindSlider('sEarn','earn',function(v){return fmt0(v)+'원';});
+bindSlider('sCust','cust',function(v){return v+'%';});
+document.getElementById('simReset').addEventListener('click',function(){
+  const defs={sPrice:4000,sDemand:100,sRefund:50,sUse:80,sEarn:2000,sCust:100};
+  const map={sPrice:'price',sDemand:'demand',sRefund:'refund',sUse:'refundUse',sEarn:'earn',sCust:'cust'};
+  const fns={sPrice:function(v){return fmt0(v)+'원';},sDemand:function(v){return v+'%';},sRefund:function(v){return v+'%';},sUse:function(v){return v+'%';},sEarn:function(v){return fmt0(v)+'원';},sCust:function(v){return v+'%';}};
+  Object.keys(defs).forEach(function(id){ document.getElementById(id).value=defs[id]; SIM[map[id]]=defs[id]; document.getElementById('v'+id.slice(1)).textContent=fns[id](defs[id]); });
+  renderSim();
+});
+document.getElementById('yearSeg').addEventListener('click',function(e){
+  if(e.target.tagName!=='BUTTON')return;
+  Array.prototype.forEach.call(e.currentTarget.children,function(b){b.classList.remove('on');}); e.target.classList.add('on');
+  curYear=e.target.dataset.y==='all'?'all':+e.target.dataset.y;
+  document.getElementById('rangeNote').textContent=curYear==='all'?'2026.01–2028.12 전체':(D.annual.year[curYear]+'년 1–12월');
+  render();
+});
+document.getElementById('tableTabs').addEventListener('click',function(e){
+  if(e.target.tagName!=='BUTTON')return;
+  Array.prototype.forEach.call(e.currentTarget.children,function(b){b.classList.remove('on');}); e.target.classList.add('on');
+  curTab=e.target.dataset.t; renderTable();
+});
+document.getElementById('rangeNote').textContent='2026.01–2028.12 전체';
+render();
+
+/* ===== 추가 시뮬레이터 (하단 탭) — 공통 차트 헬퍼 ===== */
+function G(id){return document.getElementById(id);}
+function hbarChart(rows,key,color,unit,dec){
+  dec=(dec===undefined)?1:dec;
+  var max=Math.max.apply(null,rows.map(function(r){return r[key];}))||1;
+  var W=540,rh=26,L=150,H=rows.length*rh+10;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic">';
+  rows.forEach(function(r,i){
+    var y=i*rh+8,w=(W-L-80)*(r[key]/max);
+    s+='<text x="'+(L-6)+'" y="'+(y+13)+'" font-size="10.5" fill="#1c2733" text-anchor="end">'+r.name+'</text>';
+    s+='<rect x="'+L+'" y="'+y+'" width="'+Math.max(1,w)+'" height="16" rx="3" fill="'+(r._c||color)+'"/>';
+    s+='<text x="'+(L+w+5)+'" y="'+(y+13)+'" font-size="10" fill="#5b6b7b">'+fmt(r[key],dec)+unit+'</text>';
+  });
+  return s+'</svg>';
+}
+function miniBars(items){
+  var max=Math.max.apply(null,items.map(function(i){return i.v;}))||1;
+  var W=480,H=190,L=70,bw=90,gap=60,base=150;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic">';
+  s+='<line x1="40" y1="'+base+'" x2="'+(W-10)+'" y2="'+base+'" stroke="#e3e9f2"/>';
+  items.forEach(function(it,i){
+    var x=L+i*(bw+gap),h=(base-25)*(it.v/max),y=base-h;
+    s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+it.c+'"/>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(y-6)+'" font-size="13" font-weight="700" fill="'+it.c+'" text-anchor="middle">'+fmt(it.v,1)+'억</text>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(base+16)+'" font-size="11" fill="#5b6b7b" text-anchor="middle">'+it.l+'</text>';
+  });
+  return s+'</svg>';
+}
+function donutChart(rows){
+  var total=rows.reduce(function(a,r){return a+r.amt;},0)||1,cx=85,cy=85,r=66,ir=38,ang=-Math.PI/2;
+  var s='<svg viewBox="0 0 170 170" width="170" xmlns="http://www.w3.org/2000/svg">';
+  rows.forEach(function(row){
+    var frac=row.amt/total,a2=ang+frac*2*Math.PI;
+    var x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    var xi2=cx+ir*Math.cos(a2),yi2=cy+ir*Math.sin(a2),xi1=cx+ir*Math.cos(ang),yi1=cy+ir*Math.sin(ang);
+    var lg=frac>0.5?1:0;
+    s+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+lg+' 1 '+x2+' '+y2+' L'+xi2+' '+yi2+' A'+ir+' '+ir+' 0 '+lg+' 0 '+xi1+' '+yi1+' Z" fill="'+row.color+'"/>';
+    ang=a2;
+  });
+  return s+'</svg>';
+}
+function subKpi(l,v,d){return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>';}
+
+/* ===== ① 카테고리 (기본값: 보고서·실데이터 보정) ===== */
+(function(){
+  var CATS=[['가사·돌봄',9000,7,18],['건물관리·청소',1200,35,9],['이사·입주청소',2200,28,9],
+   ['가전·가구청소',3500,11,10],['전문·특수청소',1000,38,8],['이사·운반·보관',1800,55,7],
+   ['설치·수리·조립',3500,14,9],['자동차',2200,9,10],['집수리',800,90,6],['심부름·알바',7000,3.5,12]];
+  var S={order:1,fee:1,earn:1.5,pay:40};
+  function compute(){
+    return CATS.map(function(c){
+      var orders=c[1]*S.order, gmv=orders*c[2]*10000/1e8, fee=gmv*(c[3]*S.fee/100), earn=gmv*(S.earn/100), pay=gmv*(S.pay/100)*0.04;
+      return {name:c[0],orders:orders,gmv:gmv,fee:fee,earn:earn,pay:pay,feeRate:c[3]*S.fee};
+    });
+  }
+  function render(){
+    var d=compute(),tG=0,tF=0,tE=0,tP=0,tO=0;
+    d.forEach(function(r){tG+=r.gmv;tF+=r.fee;tE+=r.earn;tP+=r.pay;tO+=r.orders;});
+    G('cat-kpis').innerHTML=subKpi('총 GMV',fmt(tG,1)+'억','/월 · 연 '+fmt(tG*12,0)+'억')+subKpi('총 수수료매출',fmt(tF,1)+'억','/월 · 연 '+fmt(tF*12,0)+'억')+subKpi('포인트 적립',fmt(tE,2)+'억','/월')+subKpi('모두페이 수수료',fmt(tP,2)+'억','침투 '+S.pay+'%')+subKpi('총 주문수',fmt0(tO)+'건','/월');
+    G('cat-chartFee').innerHTML=hbarChart(d.slice().sort(function(a,b){return b.fee-a.fee;}),'fee','#2E75B6','억');
+    G('cat-chartEarn').innerHTML=hbarChart(d.slice().sort(function(a,b){return b.earn-a.earn;}),'earn','#1f9d76','억',2);
+    var h='<thead><tr><th>카테고리</th><th>주문수</th><th>객단가(만원)</th><th>GMV(억)</th><th>수수료율</th><th>수수료매출(억)</th><th>포인트적립(억)</th></tr></thead><tbody>';
+    d.forEach(function(r,i){h+='<tr><td>'+r.name+'</td><td>'+fmt0(r.orders)+'</td><td>'+fmt(CATS[i][2],1)+'</td><td>'+fmt(r.gmv,1)+'</td><td>'+fmt(r.feeRate,1)+'%</td><td>'+fmt(r.fee,2)+'</td><td>'+fmt(r.earn,2)+'</td></tr>';});
+    h+='<tr class="tot"><td>합계</td><td>'+fmt0(tO)+'</td><td>–</td><td>'+fmt(tG,1)+'</td><td>'+fmt(tG?tF/tG*100:0,1)+'%</td><td>'+fmt(tF,1)+'</td><td>'+fmt(tE,2)+'</td></tr></tbody>';
+    G('cat-tbl').innerHTML=h;
+    G('cat-note').textContent='기본값 보정: 가사·돌봄(대리주부) 고빈도·고수수료, 이사/집수리 고객단가·저수수료. 수수료율·적립률은 슬라이더로 조정.';
+  }
+  function bind(id,key,fn){var el=G(id);el.addEventListener('input',function(){S[key]=+el.value;G('v'+id.slice(1)).textContent=fn(+el.value);render();});}
+  bind('sCatOrder','order',function(v){return v.toFixed(1)+'×';});
+  bind('sCatFee','fee',function(v){return v.toFixed(2)+'×';});
+  bind('sCatEarn','earn',function(v){return v.toFixed(1)+'%';});
+  bind('sCatPay','pay',function(v){return v+'%';});
+  render();
+})();
+
+/* ===== ② 마케팅 채널 (기본값: 보고서·실데이터 보정) ===== */
+(function(){
+  var CH=[['네이버 검색광고(SA)',2500,38000,7,0],['메타(인스타·페북)',2000,30000,6,0],['유튜브',1000,42000,5,0],
+   ['앱스토어 광고(ASA)',800,22000,9,0],['추천(레퍼럴·포인트)',1500,8000,18,1],['생활노하우 콘텐츠(오가닉)',1200,3500,8,1],
+   ['경험연결(무료 트래픽)',800,1500,6,1],['B2B 제휴',1000,11000,14,0]];
+  var S={bud:1,conv:1,ltv:60000,org:1},CUR=300000;
+  function compute(){
+    return CH.map(function(c){
+      var orgMul=c[4]?S.org:1, budget=c[1]*S.bud*10000, nu=budget/c[2]*orgMul, conv=c[3]*S.conv/100, buyers=nu*conv, effCac=budget/Math.max(1,nu);
+      return {name:c[0],budget:budget/1e8,nu:nu,conv:conv*100,buyers:buyers,cac:effCac,ltvcac:S.ltv/effCac,free:c[4]};
+    });
+  }
+  function render(){
+    var d=compute(),tB=0,tN=0,tBuy=0;
+    d.forEach(function(r){tB+=r.budget;tN+=r.nu;tBuy+=r.buyers;});
+    var bCac=tN?(tB*1e8)/tN:0;
+    G('ch-kpis').innerHTML=subKpi('월 신규고객',fmt0(tN)+'명','연 '+fmt0(tN*12))+subKpi('월 구매전환',fmt0(tBuy)+'명','연 '+fmt0(tBuy*12))+subKpi('월 마케팅비',fmt(tB,1)+'억','연 '+fmt(tB*12,1)+'억')+subKpi('Blended CAC',fmt0(bCac)+'원','LTV/CAC '+fmt(bCac?S.ltv/bCac:0,1))+subKpi('연 신규 누적',fmt0(tN*12)+'명','base 30만 +'+fmt(tN*12/CUR*100,0)+'%');
+    G('ch-chartNew').innerHTML=hbarChart(d.slice().sort(function(a,b){return b.nu-a.nu;}).map(function(r){r._c=r.free?'#1f9d76':'#2E75B6';return r;}),'nu','#2E75B6','명',0);
+    G('ch-chartEff').innerHTML=hbarChart(d.slice().sort(function(a,b){return b.ltvcac-a.ltvcac;}).map(function(r){r._c=r.free?'#1f9d76':'#e0a106';return r;}),'ltvcac','#e0a106','x',1);
+    var h='<thead><tr><th>채널</th><th>월예산(억)</th><th>CAC(원)</th><th>신규</th><th>전환율</th><th>구매고객</th><th>LTV/CAC</th></tr></thead><tbody>';
+    d.forEach(function(r){h+='<tr><td>'+r.name+(r.free?' <span class="pill" style="background:#1f9d76">무료</span>':'')+'</td><td>'+fmt(r.budget,2)+'</td><td>'+fmt0(r.cac)+'</td><td>'+fmt0(r.nu)+'</td><td>'+fmt(r.conv,1)+'%</td><td>'+fmt0(r.buyers)+'</td><td>'+fmt(r.ltvcac,1)+'</td></tr>';});
+    h+='<tr class="tot"><td>합계/평균</td><td>'+fmt(tB,2)+'</td><td>'+fmt0(bCac)+'</td><td>'+fmt0(tN)+'</td><td>–</td><td>'+fmt0(tBuy)+'</td><td>'+fmt(bCac?S.ltv/bCac:0,1)+'</td></tr></tbody>';
+    G('ch-tbl').innerHTML=h;
+    G('ch-note').textContent='보정: 보고서 전략(공급자 친화·생활노하우 콘텐츠·경험연결 무료 트래픽)에 따라 추천·오가닉·경험연결(녹색) 비중을 높여 Blended CAC를 낮춤. LTV/CAC 3+ 건전.';
+  }
+  function bind(id,key,fn){var el=G(id);el.addEventListener('input',function(){S[key]=+el.value;G('v'+id.slice(1)).textContent=fn(+el.value);render();});}
+  bind('sChBud','bud',function(v){return v.toFixed(1)+'×';});
+  bind('sChConv','conv',function(v){return v.toFixed(2)+'×';});
+  bind('sChLtv','ltv',function(v){return fmt0(v)+'원';});
+  bind('sChOrg','org',function(v){return v.toFixed(1)+'×';});
+  render();
+})();
+
+/* ===== ③ 포인트 사용처·사용율 ===== */
+(function(){
+  var OTH=[['안전결제(모두페이) 차감',35,'#1F4E79'],['쿠폰·기프티콘 교환',12,'#5B9BD5'],['멤버십(모두플러스)',10,'#e0a106'],['연계서비스(보험·통신·상조)',10,'#9b59b6'],['선물·기부',8,'#7a8aa0']];
+  var OTHSUM=75, S={issue:30,rate:65,mall:25,lift:1.3};
+  function shares(){var arr=[['포인트몰(청소·생활용품)',S.mall,'#1f9d76']],sc=(100-S.mall)/OTHSUM;OTH.forEach(function(o){arr.push([o[0],o[1]*sc,o[2]]);});return arr;}
+  function compute(){var issue=S.issue,used=issue*S.rate/100,brk=issue-used;var rows=shares().map(function(s){var amt=used*s[1]/100,mall=s[0].indexOf('포인트몰')===0;return {name:s[0],share:s[1],amt:amt,color:s[2],liftRev:mall?amt*S.lift:0};});return {issue:issue,used:used,brk:brk,rows:rows};}
+  function render(){
+    var d=compute(),mallRev=d.rows.reduce(function(a,r){return a+r.liftRev;},0),brkRate=d.issue?d.brk/d.issue*100:0;
+    G('pt-kpis').innerHTML=subKpi('연 적립',fmt(d.issue,1)+'억','발행 포인트')+subKpi('연 사용',fmt(d.used,1)+'억','사용율 '+S.rate+'%')+subKpi('연 소멸',fmt(d.brk,1)+'억','수익 전환분')+subKpi('breakage율',fmt(brkRate,1)+'%','100−사용율')+subKpi('포인트몰 유발매출',fmt(mallRev,1)+'억','유발 '+S.lift+'×');
+    G('pt-chartFlow').innerHTML=miniBars([{l:'적립',v:d.issue,c:'#5B9BD5'},{l:'사용',v:d.used,c:'#2E7D32'},{l:'소멸',v:d.brk,c:'#c0392b'}]);
+    G('pt-donut').innerHTML=donutChart(d.rows);
+    G('pt-legend').innerHTML=d.rows.map(function(r){return '<span><i class="sw" style="background:'+r.color+'"></i>'+r.name+' · '+fmt(r.share,0)+'%</span>';}).join('');
+    var h='<thead><tr><th>사용처</th><th>비중</th><th>사용액(억)</th><th>유발매출(억)</th></tr></thead><tbody>';
+    d.rows.forEach(function(r){h+='<tr><td>'+r.name+'</td><td>'+fmt(r.share,1)+'%</td><td>'+fmt(r.amt,2)+'</td><td>'+(r.liftRev?fmt(r.liftRev,2):'–')+'</td></tr>';});
+    h+='<tr class="tot"><td>합계</td><td>100%</td><td>'+fmt(d.used,1)+'</td><td>'+fmt(mallRev,2)+'</td></tr></tbody>';
+    G('pt-tbl').innerHTML=h;
+    G('pt-note').textContent='사용율↑=락인·비용↑, 소멸↑=회계상 수익 전환(부채 감소). 포인트몰 비중↑ → 청소·생활용품 추가구매(유발매출)로 콘텐츠→구매 루프 강화.';
+  }
+  function bind(id,key,fn){var el=G(id);el.addEventListener('input',function(){S[key]=+el.value;G('v'+id.slice(1)).textContent=fn(+el.value);render();});}
+  bind('sPtIssue','issue',function(v){return v.toFixed(1)+'억';});
+  bind('sPtRate','rate',function(v){return v+'%';});
+  bind('sPtMall','mall',function(v){return v+'%';});
+  bind('sPtLift','lift',function(v){return v.toFixed(1)+'×';});
+  render();
+})();
+
+/* ===== 하단 탭 전환 ===== */
+document.getElementById('subtabs').addEventListener('click',function(e){
+  if(e.target.tagName!=='BUTTON')return;
+  Array.prototype.forEach.call(e.currentTarget.children,function(b){b.classList.remove('on');});
+  e.target.classList.add('on');
+  var s=e.target.dataset.s;
+  ['cat','ch','pt'].forEach(function(k){document.getElementById('panel-'+k).classList.toggle('on',k===s);});
+});
+
+</script>
+</body>
+</html>

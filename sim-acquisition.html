@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모두연결 · 고객모집·마케팅채널 시뮬레이터</title>
+<style>
+  :root{--navy:#1F4E79;--blue:#2E75B6;--light:#EAF1FB;--line:#e3e9f2;--ink:#1c2733;--gray:#5b6b7b;--gold:#e0a106;--green:#2E7D32;--red:#c0392b;--bg:#eef3f9}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+  header{background:linear-gradient(135deg,#163a5c,#1F4E79 55%,#2E75B6);color:#fff;padding:28px 0 22px}
+  .tag{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+  header h1{font-size:23px;font-weight:800}
+  header .sub{opacity:.9;font-size:13px;margin-top:5px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 13px}
+  .kpi .l{font-size:11px;color:var(--gray)}
+  .kpi .v{font-size:19px;font-weight:800;color:var(--navy);margin-top:3px}
+  .kpi .d{font-size:10.5px;color:var(--gray);margin-top:2px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 8px rgba(31,78,121,.05);margin-bottom:16px}
+  .card h3{font-size:15px;color:var(--navy);margin-bottom:8px}
+  .simgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .sl .slrow{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+  .sl .slrow b{color:var(--navy)} .slv{color:var(--blue);font-weight:800}
+  input[type=range]{width:100%;accent-color:var(--blue);height:5px}
+  .slhint{font-size:10.5px;color:#9aa7b5;margin-top:3px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right}
+  th{background:var(--navy);color:#fff;font-size:11px}
+  th:first-child,td:first-child{text-align:left}
+  td:first-child{font-weight:600;color:var(--navy)}
+  tr.tot td{background:#fff7e6;font-weight:800;border-top:2px solid var(--gold)}
+  .pill{font-size:10px;padding:2px 7px;border-radius:20px;color:#fff}
+  .note{font-size:11.5px;color:var(--gray);margin-top:8px}
+  footer{padding:20px 0 44px;color:var(--gray);font-size:11.5px;text-align:center}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.simgrid{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- INTEGRATED NAV START -->
+<style>
+  .mcnav{position:sticky;top:0;z-index:1000;background:#143150;color:#fff;
+    font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .mcnav-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;
+    gap:6px;padding:0 16px;flex-wrap:wrap}
+  .mcnav-brand{font-weight:800;font-size:15px;color:#fff;padding:11px 14px 11px 0;
+    letter-spacing:-.4px;white-space:nowrap}
+  .mcnav-brand span{color:#7fc1ff}
+  .mcnav-link{color:#cfe0f2;text-decoration:none;font-size:13px;font-weight:600;
+    padding:9px 13px;border-radius:8px;white-space:nowrap;transition:.15s}
+  .mcnav-link:hover{background:rgba(255,255,255,.12);color:#fff}
+  .mcnav-link.on{background:#2E75B6;color:#fff}
+  @media(max-width:640px){.mcnav-brand{width:100%;padding-bottom:4px}
+    .mcnav-link{font-size:12px;padding:7px 10px}}
+</style>
+<nav class="mcnav"><div class="mcnav-inner">
+<a class="mcnav-brand" href="index.html">모두연결 <span>포인트 전략</span></a>
+<a class="mcnav-link" href="index.html">종합 대시보드</a><a class="mcnav-link" href="sim-order-revenue.html">주문수익·포인트</a><a class="mcnav-link" href="sim-point-usage.html">포인트 사용처·사용율</a><a class="mcnav-link on" href="sim-acquisition.html">고객모집·마케팅</a><a class="mcnav-link" href="structure.html">전략 구조도</a>
+</div></nav>
+<!-- INTEGRATED NAV END -->
+
+<header><div class="wrap">
+  <span class="tag">시뮬레이션 · 가정 기반</span>
+  <h1>고객 모집 · 마케팅 채널 계획 시뮬레이터</h1>
+  <div class="sub">채널별 예산·CAC·전환율·LTV를 조정해 신규 고객 모집·구매 전환·효율(LTV/CAC)을 즉시 계산 · 현재 고객 30만 기준</div>
+</div></header>
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+  <div class="card">
+    <h3>전역 가정 슬라이더</h3>
+    <div class="simgrid">
+      <div class="sl"><div class="slrow"><b>총 예산 배수</b><span class="slv" id="vBud">1.0×</span></div><input type="range" id="sBud" min="0.3" max="3" step="0.1" value="1"><div class="slhint">전체 채널 예산 ×</div></div>
+      <div class="sl"><div class="slrow"><b>구매 전환율 배수</b><span class="slv" id="vConv">1.0×</span></div><input type="range" id="sConv" min="0.6" max="1.6" step="0.05" value="1"><div class="slhint">신규→구매 전환 ×</div></div>
+      <div class="sl"><div class="slrow"><b>고객 LTV</b><span class="slv" id="vLtv">60,000원</span></div><input type="range" id="sLtv" min="30000" max="150000" step="5000" value="60000"><div class="slhint">생애가치(누적 기여)</div></div>
+      <div class="sl"><div class="slrow"><b>무료·추천 채널 강화</b><span class="slv" id="vOrg">1.0×</span></div><input type="range" id="sOrg" min="0.5" max="3" step="0.1" value="1"><div class="slhint">추천·콘텐츠·경험연결 유입 ×</div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>채널별 월 신규 고객</h3><div id="chartNew"></div></div>
+    <div class="card"><h3>채널별 효율 (LTV/CAC)</h3><div id="chartEff"></div></div>
+  </div>
+  <div class="card">
+    <h3>채널별 상세 (월 기준)</h3>
+    <div style="overflow-x:auto"><table id="tbl"></table></div>
+    <div class="note" id="note"></div>
+  </div>
+</div>
+<footer><div class="wrap">모두연결 · 고객모집·마케팅채널 시뮬레이터 · 가정 기반 플래닝 도구 · 2026.06</div></footer>
+<script>
+// [name, 월예산(만원), CAC(원), 전환율%, 무료채널?]
+var CH=[
+ ['네이버 검색광고(SA)',4000,35000,8,0],['메타(인스타·페북)',3000,28000,6,0],
+ ['유튜브',1500,40000,5,0],['앱스토어 광고(ASA)',1000,25000,9,0],
+ ['추천(레퍼럴·포인트)',800,9000,18,1],['생활노하우 콘텐츠(오가닉)',600,4000,7,1],
+ ['경험연결(무료 트래픽)',300,2000,5,1],['B2B 제휴',500,12000,14,0]];
+var S={bud:1,conv:1,ltv:60000,org:1},CUR=300000;
+function $(id){return document.getElementById(id);}
+function fmt(v,d){d=(d===undefined)?1:d;return Number(v).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmt0(v){return Number(Math.round(v)).toLocaleString('ko-KR');}
+function compute(){
+  return CH.map(function(c){
+    var orgMul=c[4]?S.org:1;
+    var budget=c[1]*S.bud*10000;            // 원
+    var nu=budget/c[2]*orgMul;              // 신규(예산/CAC), 무료채널은 유입가중
+    var conv=c[3]*S.conv/100;
+    var buyers=nu*conv;
+    var effCac=budget/Math.max(1,nu);
+    var ltvcac=S.ltv/effCac;
+    var rev=buyers*S.ltv/1e8;               // 억 (LTV 기여)
+    return {name:c[0],budget:budget/1e8,nu:nu,conv:conv*100,buyers:buyers,cac:effCac,ltvcac:ltvcac,rev:rev,free:c[4]};
+  });
+}
+function hbar(elId,rows,key,color,unit,dec){
+  dec=(dec===undefined)?1:dec;
+  var max=Math.max.apply(null,rows.map(function(r){return r[key];}))||1;
+  var W=540,rh=26,L=150,H=rows.length*rh+10;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic">';
+  rows.forEach(function(r,i){
+    var y=i*rh+8,w=(W-L-80)*(r[key]/max);
+    s+='<text x="'+(L-6)+'" y="'+(y+13)+'" font-size="10.5" fill="#1c2733" text-anchor="end">'+r.name+'</text>';
+    s+='<rect x="'+L+'" y="'+y+'" width="'+Math.max(1,w)+'" height="16" rx="3" fill="'+(r.free?'#1f9d76':color)+'"/>';
+    s+='<text x="'+(L+w+5)+'" y="'+(y+13)+'" font-size="10" fill="#5b6b7b">'+fmt(r[key],dec)+unit+'</text>';
+  });
+  s+='</svg>'; $(elId).innerHTML=s;
+}
+function render(){
+  var d=compute();
+  var tBud=0,tNu=0,tBuy=0,tRev=0;
+  d.forEach(function(r){tBud+=r.budget;tNu+=r.nu;tBuy+=r.buyers;tRev+=r.rev;});
+  var bCac=tNu?(tBud*1e8)/tNu:0, bLtvcac=bCac?S.ltv/bCac:0;
+  $('kpis').innerHTML=
+    kpi('월 총 신규고객',fmt0(tNu)+'명','연 '+fmt0(tNu*12))+
+    kpi('월 구매 전환고객',fmt0(tBuy)+'명','연 '+fmt0(tBuy*12))+
+    kpi('월 마케팅비',fmt(tBud,1)+'억','연 '+fmt(tBud*12,1)+'억')+
+    kpi('Blended CAC',fmt0(bCac)+'원','LTV/CAC '+fmt(bLtvcac,1))+
+    kpi('연 신규 누적',fmt0(tNu*12)+'명','base 30만 대비 +'+fmt(tNu*12/CUR*100,0)+'%');
+  hbar('chartNew',d.slice().sort(function(a,b){return b.nu-a.nu;}),'nu','#2E75B6','명',0);
+  hbar('chartEff',d.slice().sort(function(a,b){return b.ltvcac-a.ltvcac;}),'ltvcac','#e0a106','x',1);
+  var h='<thead><tr><th>채널</th><th>월예산(억)</th><th>CAC(원)</th><th>신규</th><th>전환율</th><th>구매고객</th><th>LTV/CAC</th></tr></thead><tbody>';
+  d.forEach(function(r){
+    h+='<tr><td>'+r.name+(r.free?' <span class="pill" style="background:#1f9d76">무료</span>':'')+'</td><td>'+fmt(r.budget,2)+'</td><td>'+fmt0(r.cac)+'</td><td>'+fmt0(r.nu)+'</td><td>'+fmt(r.conv,1)+'%</td><td>'+fmt0(r.buyers)+'</td><td>'+fmt(r.ltvcac,1)+'</td></tr>';
+  });
+  h+='<tr class="tot"><td>합계/평균</td><td>'+fmt(tBud,2)+'</td><td>'+fmt0(bCac)+'</td><td>'+fmt0(tNu)+'</td><td>–</td><td>'+fmt0(tBuy)+'</td><td>'+fmt(bLtvcac,1)+'</td></tr>';
+  h+='</tbody>'; $('tbl').innerHTML=h;
+  $('note').textContent='무료·추천 채널(녹색)은 CAC가 낮아 효율(LTV/CAC)이 높습니다. LTV/CAC 3 이상이 건전 기준. 기본값은 가정 예시이며 슬라이더로 조정합니다.';
+}
+function kpi(l,v,d){return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>';}
+function bind(id,key,fn){var el=$(id);el.addEventListener('input',function(){S[key]=+el.value;$('v'+id.slice(1)).textContent=fn(+el.value);render();});}
+bind('sBud','bud',function(v){return v.toFixed(1)+'×';});
+bind('sConv','conv',function(v){return v.toFixed(2)+'×';});
+bind('sLtv','ltv',function(v){return fmt0(v)+'원';});
+bind('sOrg','org',function(v){return v.toFixed(1)+'×';});
+render();
+</script>
+</body>
+</html>

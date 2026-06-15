@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모두연결 · 포인트 사용처·사용율 시뮬레이터</title>
+<style>
+  :root{--navy:#1F4E79;--blue:#2E75B6;--light:#EAF1FB;--line:#e3e9f2;--ink:#1c2733;--gray:#5b6b7b;--gold:#e0a106;--green:#2E7D32;--red:#c0392b;--bg:#eef3f9}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+  header{background:linear-gradient(135deg,#163a5c,#1F4E79 55%,#2E75B6);color:#fff;padding:28px 0 22px}
+  .tag{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+  header h1{font-size:23px;font-weight:800}
+  header .sub{opacity:.9;font-size:13px;margin-top:5px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 13px}
+  .kpi .l{font-size:11px;color:var(--gray)}
+  .kpi .v{font-size:19px;font-weight:800;color:var(--navy);margin-top:3px}
+  .kpi .d{font-size:10.5px;color:var(--gray);margin-top:2px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 8px rgba(31,78,121,.05);margin-bottom:16px}
+  .card h3{font-size:15px;color:var(--navy);margin-bottom:8px}
+  .simgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .sl .slrow{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+  .sl .slrow b{color:var(--navy)} .slv{color:var(--blue);font-weight:800}
+  input[type=range]{width:100%;accent-color:var(--blue);height:5px}
+  .slhint{font-size:10.5px;color:#9aa7b5;margin-top:3px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right}
+  th{background:var(--navy);color:#fff;font-size:11px}
+  th:first-child,td:first-child{text-align:left}
+  td:first-child{font-weight:600;color:var(--navy)}
+  tr.tot td{background:#fff7e6;font-weight:800;border-top:2px solid var(--gold)}
+  .lg{display:flex;flex-direction:column;gap:6px;font-size:12px}
+  .lg span{display:flex;align-items:center;gap:7px}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .note{font-size:11.5px;color:var(--gray);margin-top:8px}
+  footer{padding:20px 0 44px;color:var(--gray);font-size:11.5px;text-align:center}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.simgrid{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- INTEGRATED NAV START -->
+<style>
+  .mcnav{position:sticky;top:0;z-index:1000;background:#143150;color:#fff;
+    font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .mcnav-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;
+    gap:6px;padding:0 16px;flex-wrap:wrap}
+  .mcnav-brand{font-weight:800;font-size:15px;color:#fff;padding:11px 14px 11px 0;
+    letter-spacing:-.4px;white-space:nowrap}
+  .mcnav-brand span{color:#7fc1ff}
+  .mcnav-link{color:#cfe0f2;text-decoration:none;font-size:13px;font-weight:600;
+    padding:9px 13px;border-radius:8px;white-space:nowrap;transition:.15s}
+  .mcnav-link:hover{background:rgba(255,255,255,.12);color:#fff}
+  .mcnav-link.on{background:#2E75B6;color:#fff}
+  @media(max-width:640px){.mcnav-brand{width:100%;padding-bottom:4px}
+    .mcnav-link{font-size:12px;padding:7px 10px}}
+</style>
+<nav class="mcnav"><div class="mcnav-inner">
+<a class="mcnav-brand" href="index.html">모두연결 <span>포인트 전략</span></a>
+<a class="mcnav-link" href="index.html">종합 대시보드</a><a class="mcnav-link" href="sim-order-revenue.html">주문수익·포인트</a><a class="mcnav-link on" href="sim-point-usage.html">포인트 사용처·사용율</a><a class="mcnav-link" href="sim-acquisition.html">고객모집·마케팅</a><a class="mcnav-link" href="structure.html">전략 구조도</a>
+</div></nav>
+<!-- INTEGRATED NAV END -->
+
+<header><div class="wrap">
+  <span class="tag">시뮬레이션 · 가정 기반</span>
+  <h1>고객 포인트 사용처 · 사용율 시뮬레이터</h1>
+  <div class="sub">적립 포인트의 사용율(redemption)·사용처 구성·breakage(소멸)와 포인트몰 유발 매출을 즉시 계산</div>
+</div></header>
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+  <div class="card">
+    <h3>전역 가정 슬라이더</h3>
+    <div class="simgrid">
+      <div class="sl"><div class="slrow"><b>연 적립 규모</b><span class="slv" id="vIssue">30.0억</span></div><input type="range" id="sIssue" min="5" max="100" step="1" value="30"><div class="slhint">한 해 발행되는 고객 포인트</div></div>
+      <div class="sl"><div class="slrow"><b>전체 사용율</b><span class="slv" id="vRate">65%</span></div><input type="range" id="sRate" min="40" max="90" step="1" value="65"><div class="slhint">나머지는 breakage(소멸)</div></div>
+      <div class="sl"><div class="slrow"><b>포인트몰 비중</b><span class="slv" id="vMall">25%</span></div><input type="range" id="sMall" min="10" max="55" step="1" value="25"><div class="slhint">나머지 사용처는 비례 조정</div></div>
+      <div class="sl"><div class="slrow"><b>포인트몰 구매 유발 배수</b><span class="slv" id="vLift">1.3×</span></div><input type="range" id="sLift" min="1" max="2.5" step="0.1" value="1.3"><div class="slhint">포인트 1원이 끄는 실제 구매액</div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>적립 → 사용 → 소멸</h3><div id="chartFlow"></div></div>
+    <div class="card"><h3>사용처 구성</h3><div class="grid2" style="grid-template-columns:160px 1fr;gap:14px"><div id="donut"></div><div class="lg" id="legend"></div></div></div>
+  </div>
+  <div class="card">
+    <h3>사용처별 상세 (연 기준)</h3>
+    <div style="overflow-x:auto"><table id="tbl"></table></div>
+    <div class="note" id="note"></div>
+  </div>
+</div>
+<footer><div class="wrap">모두연결 · 포인트 사용처·사용율 시뮬레이터 · 가정 기반 플래닝 도구 · 2026.06</div></footer>
+<script>
+// 포인트몰 외 사용처: [name, base비중, color]
+var OTH=[
+ ['안전결제(모두페이) 차감',35,'#1F4E79'],['쿠폰·기프티콘 교환',12,'#5B9BD5'],
+ ['멤버십(모두플러스)',10,'#e0a106'],['연계서비스(보험·통신·상조)',10,'#9b59b6'],['선물·기부',8,'#7a8aa0']];
+var OTHSUM=75; // base others sum (mall base 25)
+var S={issue:30,rate:65,mall:25,lift:1.3};
+function $(id){return document.getElementById(id);}
+function fmt(v,d){d=(d===undefined)?1:d;return Number(v).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function shares(){
+  var arr=[['포인트몰(청소·생활용품)',S.mall,'#1f9d76']];
+  var scale=(100-S.mall)/OTHSUM;
+  OTH.forEach(function(o){arr.push([o[0],o[1]*scale,o[2]]);});
+  return arr;
+}
+function compute(){
+  var issue=S.issue, used=issue*S.rate/100, brk=issue-used;
+  var sh=shares();
+  var rows=sh.map(function(s){
+    var amt=used*s[1]/100;
+    var mall=s[0].indexOf('포인트몰')===0;
+    return {name:s[0],share:s[1],amt:amt,color:s[2],liftRev:mall?amt*S.lift:0};
+  });
+  return {issue:issue,used:used,brk:brk,rows:rows};
+}
+function bars(elId,items){
+  var max=Math.max.apply(null,items.map(function(i){return i.v;}))||1;
+  var W=480,H=190,L=70,bw=90,gap=60,base=150;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic">';
+  s+='<line x1="40" y1="'+base+'" x2="'+(W-10)+'" y2="'+base+'" stroke="#e3e9f2"/>';
+  items.forEach(function(it,i){
+    var x=L+i*(bw+gap), h=(base-25)*(it.v/max), y=base-h;
+    s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+it.c+'"/>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(y-6)+'" font-size="13" font-weight="700" fill="'+it.c+'" text-anchor="middle">'+fmt(it.v,1)+'억</text>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(base+16)+'" font-size="11" fill="#5b6b7b" text-anchor="middle">'+it.l+'</text>';
+  });
+  s+='</svg>'; $(elId).innerHTML=s;
+}
+function donut(elId,rows){
+  var total=rows.reduce(function(a,r){return a+r.amt;},0)||1, cx=80,cy=80,r=62,ir=36,ang=-Math.PI/2;
+  var s='<svg viewBox="0 0 160 160" width="160" xmlns="http://www.w3.org/2000/svg">';
+  rows.forEach(function(row){
+    var frac=row.amt/total, a2=ang+frac*2*Math.PI;
+    var x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    var xi2=cx+ir*Math.cos(a2),yi2=cy+ir*Math.sin(a2),xi1=cx+ir*Math.cos(ang),yi1=cy+ir*Math.sin(ang);
+    var large=frac>0.5?1:0;
+    s+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+' L'+xi2+' '+yi2+' A'+ir+' '+ir+' 0 '+large+' 0 '+xi1+' '+yi1+' Z" fill="'+row.color+'"/>';
+    ang=a2;
+  });
+  s+='</svg>'; $(elId).innerHTML=s;
+}
+function render(){
+  var d=compute();
+  var mallRev=d.rows.reduce(function(a,r){return a+r.liftRev;},0);
+  var brkRate=d.issue?d.brk/d.issue*100:0;
+  $('kpis').innerHTML=
+    kpi('연 적립',fmt(d.issue,1)+'억','발행 포인트')+
+    kpi('연 사용',fmt(d.used,1)+'억','사용율 '+S.rate+'%')+
+    kpi('연 소멸(breakage)',fmt(d.brk,1)+'억','수익 전환분')+
+    kpi('breakage율',fmt(brkRate,1)+'%','100−사용율')+
+    kpi('포인트몰 유발매출',fmt(mallRev,1)+'억','유발 '+S.lift+'×');
+  bars('chartFlow',[{l:'적립',v:d.issue,c:'#5B9BD5'},{l:'사용',v:d.used,c:'#2E7D32'},{l:'소멸',v:d.brk,c:'#c0392b'}]);
+  donut('donut',d.rows);
+  $('legend').innerHTML=d.rows.map(function(r){return '<span><i class="sw" style="background:'+r.color+'"></i>'+r.name+' · '+fmt(r.share,0)+'%</span>';}).join('');
+  var h='<thead><tr><th>사용처</th><th>비중</th><th>사용액(억)</th><th>유발매출(억)</th></tr></thead><tbody>';
+  d.rows.forEach(function(r){h+='<tr><td>'+r.name+'</td><td>'+fmt(r.share,1)+'%</td><td>'+fmt(r.amt,2)+'</td><td>'+(r.liftRev?fmt(r.liftRev,2):'–')+'</td></tr>';});
+  h+='<tr class="tot"><td>합계</td><td>100%</td><td>'+fmt(d.used,1)+'</td><td>'+fmt(mallRev,2)+'</td></tr></tbody>';
+  $('tbl').innerHTML=h;
+  $('note').textContent='사용율↑ = 락인↑·비용↑, 소멸↑ = 회계상 수익 전환↑(부채 감소). 포인트몰 비중을 키우면 청소·생활용품 추가구매(유발매출)가 늘어 콘텐츠→구매 루프가 강해집니다.';
+}
+function kpi(l,v,dd){return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="d">'+dd+'</div></div>';}
+function bind(id,key,fn){var el=$(id);el.addEventListener('input',function(){S[key]=+el.value;$('v'+id.slice(1)).textContent=fn(+el.value);render();});}
+bind('sIssue','issue',function(v){return v.toFixed(1)+'억';});
+bind('sRate','rate',function(v){return v+'%';});
+bind('sMall','mall',function(v){return v+'%';});
+bind('sLift','lift',function(v){return v.toFixed(1)+'×';});
+render();
+</script>
+</body>
+</html>
